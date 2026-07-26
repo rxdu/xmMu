@@ -50,6 +50,14 @@ ADR-0003 hardening + HAL-completion effort. `[ ]` todo · `[~]` in progress · `
 - [x] CI: ASan+UBSan job (blocking), TSan job (advisory), coverage artifact
 - [x] Full suite 123/123 green, incl. under ASan+UBSan with leak detection
 
+## Phase 6 — HiPNUC protocol currency (blocked: vendor firmware)
+Review of the vendored `ch_serial` parser vs HiPNUC CUM Rev 1.7.2 — see [docs/hipnuc-protocol-review.md](docs/hipnuc-protocol-review.md). HI91 decode + CRC are correct/current; gaps recorded. **No change until the vendor confirms firmware/protocol (esp. HI91 offset 1–2 semantics).**
+- [ ] (blocked) Confirm HI91 offset 1–2: `main_status` (Rev 1.7.2) vs the current `pps_sync_ms` label — request latest firmware from vendor
+- [ ] (safe, after confirm) Rename `pps_sync_ms` → `main_status` to match spec (cosmetic; no offset/behavior change)
+- [ ] (gated on confirm) Surface `main_status` health bits (`ATT_CONV`/`MAG_DIST`/`ACC_SAT`/`GYR_SAT`/`STATIC`) into `ImuSample`/`Health()`
+- [ ] (additive) Add HI83 (`0x83`) frame support — native m/s²·rad/s units + µs device timestamp
+- Keep the legacy item handlers (`0xA0`–`0xF0`): they are the backward-compat path for older item-format firmware — do NOT remove
+
 ## Downstream (separate effort — NOT in xmDriver)
 - [ ] xmNavigation: migrate actuator groups + any IMU/RC/HID consumers to `xmotion::hal`
       (the legacy interfaces are gone; Assembly CI red until ∇ migrates — ADR 0003)
